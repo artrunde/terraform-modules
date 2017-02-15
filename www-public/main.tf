@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------------------------------------------------
-# CREATE AN S3 BUCKETS FOR STATIC WEBSITES. ONE FOR HTML AND ONE FOR ASSETS
+# CREATE AN S3 BUCKETS FOR STATIC WEBSITES, HTML AND ONE FOR ROOT DOMAIN
 # ---------------------------------------------------------------------------------------------------------------------
 
 // Public domain html. e.g. www.artrunde.com
@@ -64,6 +64,7 @@ resource "aws_s3_bucket" "www-public-assets" {
 resource "aws_s3_bucket" "www-public-root" {
 
   bucket = "${var.bucket_root}"
+  force_destroy = true
 
   tags {
     "name"  = "${var.name_root}"
