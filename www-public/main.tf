@@ -97,7 +97,7 @@ resource "aws_s3_bucket" "www-public-logs" {
 
   bucket = "www-public-logs-${random_id.www-public-logs.hex}"
   force_destroy = false
-  acl = "private"
+  acl = "log-delivery-write"
 
   tags {
     "name"  = "www-public-logs"
