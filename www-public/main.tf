@@ -29,7 +29,7 @@ resource "aws_s3_bucket" "www-public-html" {
 
   logging {
     target_bucket = "${aws_s3_bucket.www-public-logs.id}"
-    target_prefix = "${var.bucket_root}/"
+    target_prefix = "${var.bucket_html}/"
   }
 
   policy = "${file("www-public-html-policy.json")}" // This should always be relative to the env path
@@ -63,7 +63,7 @@ resource "aws_s3_bucket" "www-public-assets" {
 
   logging {
     target_bucket = "${aws_s3_bucket.www-public-logs.id}"
-    target_prefix = "${var.bucket_root}/"
+    target_prefix = "${var.bucket_assets}/"
   }
 
   policy = "${file("www-public-assets-policy.json")}" // This should always be relative to the env path
