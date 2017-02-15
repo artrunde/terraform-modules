@@ -27,6 +27,11 @@ resource "aws_s3_bucket" "www-public-html" {
     error_document = "error.html"
   }
 
+  logging {
+    target_bucket = "${aws_s3_bucket.www-public-logs.id}"
+    target_prefix = "${aws_s3_bucket.www-public-html.bucket_domain_name}"
+  }
+
   policy = "${file("www-public-html-policy.json")}" // This should always be relative to the env path
 
 }
@@ -56,6 +61,11 @@ resource "aws_s3_bucket" "www-public-assets" {
     error_document = "error.html"
   }
 
+  logging {
+    target_bucket = "${aws_s3_bucket.www-public-logs.id}"
+    target_prefix = "${aws_s3_bucket.www-public-assets.bucket_domain_name}"
+  }
+
   policy = "${file("www-public-assets-policy.json")}" // This should always be relative to the env path
 
 }
@@ -75,4 +85,26 @@ resource "aws_s3_bucket" "www-public-root" {
     redirect_all_requests_to = "${var.redirect_all_to}"
   }
 
+  logging {
+    target_bucket = "${aws_s3_bucket.www-public-logs.id}"
+    target_prefix = "${aws_s3_bucket.www-public-root.bucket_domain_name}"
+  }
+
+}
+
+// Log bucket. Should not be destroyed. But redeployed under new name when apply
+resource "aws_s3_bucket" "www-public-logs" {
+
+  bucket = "www-public-logs-${random_id.www-public-logs.hex}"
+  force_destroy = false
+  acl = "private"
+
+  tags {
+    "name"  = "www-public-logs"
+    "env"   = "${var.env}"
+  }
+}
+
+resource "random_id" "www-public-logs" {
+  byte_length = 8
 }

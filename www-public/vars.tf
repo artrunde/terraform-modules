@@ -14,7 +14,6 @@ variable "bucket_root" {
   description = "The name for the S3 bucket"
 }
 
-
 variable "cache_max_age_html" {
   description = "HTTP header max-age for caching"
   default     = 300
@@ -26,12 +25,12 @@ variable "cache_max_age_assets" {
 }
 
 variable "acl_html" {
-  description = "The name of the bucket for assets"
+  description = "The permission of the bucket for assets"
   default     = "public-read"
 }
 
 variable "acl_assets" {
-  description = "The name of the bucket for assets"
+  description = "The permission of the bucket for assets"
   default     = "public-read"
 }
 
