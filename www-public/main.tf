@@ -29,7 +29,7 @@ resource "aws_s3_bucket" "www-public-html" {
 
   logging {
     target_bucket = "${aws_s3_bucket.www-public-logs.id}"
-    target_prefix = "${var.bucket_html}/"
+    target_prefix = "${var.bucket_html}"
   }
 
   policy = "${file("www-public-html-policy.json")}" // This should always be relative to the env path
@@ -63,41 +63,23 @@ resource "aws_s3_bucket" "www-public-assets" {
 
   logging {
     target_bucket = "${aws_s3_bucket.www-public-logs.id}"
-    target_prefix = "${var.bucket_assets}/"
+    target_prefix = "${var.bucket_assets}"
   }
 
   policy = "${file("www-public-assets-policy.json")}" // This should always be relative to the env path
 
 }
 
-// Public root domain. e.g. artrunde.com
-resource "aws_s3_bucket" "www-public-root" {
-
-  bucket = "${var.bucket_root}"
-  force_destroy = true
-
-  tags {
-    "name"  = "${var.name_root}"
-    "env"   = "${var.env}"
-  }
-
-  website {
-    redirect_all_requests_to = "${var.redirect_all_to}"
-  }
-
-  logging {
-    target_bucket = "${aws_s3_bucket.www-public-logs.id}"
-    target_prefix = "${var.bucket_root}/"
-  }
-
-}
+# ------------------------------------------------------------------------------
+# S3 LOG BUCKET
+# ------------------------------------------------------------------------------
 
 // Log bucket. Should not be destroyed. But redeployed under new name when apply
 resource "aws_s3_bucket" "www-public-logs" {
 
-  bucket = "www-public-logs-${random_id.www-public-logs.hex}"
+  bucket        = "www-public-logs-artrunde-${random_id.www-public-logs.hex}"
   force_destroy = false
-  acl = "log-delivery-write"
+  acl           = "log-delivery-write"
 
   tags {
     "name"  = "www-public-logs"
@@ -105,6 +87,54 @@ resource "aws_s3_bucket" "www-public-logs" {
   }
 }
 
+# ------------------------------------------------------------------------------
+# USED FOR RANDOM NAMING
+# ------------------------------------------------------------------------------
+
 resource "random_id" "www-public-logs" {
   byte_length = 8
+}
+
+# ------------------------------------------------------------------------------
+# CONFIGURE DNS ZONE
+# ------------------------------------------------------------------------------
+
+resource "aws_route53_zone" "html" {
+  name = "${var.zone_html}"
+  tags {
+    env = "${var.env}"
+  }
+}
+
+resource "aws_route53_zone" "assets" {
+  name = "${var.zone_assets}"
+  tags {
+    env = "${var.env}"
+  }
+}
+
+# ------------------------------------------------------------------------------
+# CONFIGURE DNS FOR S3 BUCKETS
+# ------------------------------------------------------------------------------
+
+resource "aws_route53_record" "assets" {
+
+  zone_id = "${aws_route53_zone.html.zone_id}"
+  name = "${var.record_assets}"
+  type = "MX"
+  ttl = "300"
+  records = [
+    "${aws_s3_bucket.www-public-assets.bucket_domain_name}"
+  ]
+}
+
+resource "aws_route53_record" "mail-autodiscover" {
+
+  zone_id = "${aws_route53_zone.html.zone_id}"
+  name = "${var.record_html}"
+  type = "CNAME"
+  ttl = "300"
+  records = [
+    "${aws_s3_bucket.www-public-html.bucket_domain_name}"
+  ]
 }

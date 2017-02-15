@@ -9,7 +9,3 @@ output "bucket_html_domain_name" {
 output "bucket_assets_domain_name" {
   value = "${aws_s3_bucket.www-public-assets.bucket_domain_name}"
 }
-
-output "bucket_root_domain_name" {
-  value = "${aws_s3_bucket.www-public-root.bucket_domain_name}"
-}

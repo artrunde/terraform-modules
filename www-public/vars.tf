@@ -10,10 +10,6 @@ variable "bucket_assets" {
   description = "The name for the S3 bucket"
 }
 
-variable "bucket_root" {
-  description = "The name for the S3 bucket"
-}
-
 variable "cache_max_age_html" {
   description = "HTTP header max-age for caching"
   default     = 300
@@ -42,12 +38,24 @@ variable "name_assets" {
   description = "Used for the tag 'name'"
 }
 
-variable "name_root" {
-  description = "Used for the tag 'name'"
+# ---------------------------------------------------------------------------------------------------------------------
+# DNS
+# ---------------------------------------------------------------------------------------------------------------------
+
+variable "record_assets" {
+  description = "Used for new asset record"
 }
 
-variable "redirect_all_to" {
-  description = "Protocal and host to redirect all requests to. E.g https://www.artrunde.com"
+variable "record_html" {
+  description = "Used for new html record"
+}
+
+variable "zone_assets" {
+  description = "Used for new hosted assets zone"
+}
+
+variable "zone_html" {
+  description = "Used for new hosted html zone"
 }
 
 variable "env" {
