@@ -46,16 +46,8 @@ variable "record_assets" {
   description = "Used for new asset record"
 }
 
-variable "record_html" {
-  description = "Used for new html record"
-}
-
-variable "zone_assets" {
-  description = "Used for new hosted assets zone"
-}
-
-variable "zone_html" {
-  description = "Used for new hosted html zone"
+variable "record_www" {
+  description = "Used for new www record"
 }
 
 variable "env" {

@@ -29,7 +29,7 @@ resource "aws_s3_bucket" "www-public-html" {
 
   logging {
     target_bucket = "${aws_s3_bucket.www-public-logs.id}"
-    target_prefix = "${var.bucket_html}"
+    target_prefix = "${var.bucket_html}-"
   }
 
   policy = "${file("www-public-html-policy.json")}" // This should always be relative to the env path
@@ -63,7 +63,7 @@ resource "aws_s3_bucket" "www-public-assets" {
 
   logging {
     target_bucket = "${aws_s3_bucket.www-public-logs.id}"
-    target_prefix = "${var.bucket_assets}"
+    target_prefix = "${var.bucket_assets}-"
   }
 
   policy = "${file("www-public-assets-policy.json")}" // This should always be relative to the env path
@@ -96,21 +96,12 @@ resource "random_id" "www-public-logs" {
 }
 
 # ------------------------------------------------------------------------------
-# CONFIGURE DNS ZONE
+# GET DNS ZONE INFOMRATION
 # ------------------------------------------------------------------------------
 
-resource "aws_route53_zone" "html" {
-  name = "${var.zone_html}"
-  tags {
-    env = "${var.env}"
-  }
-}
-
-resource "aws_route53_zone" "assets" {
-  name = "${var.zone_assets}"
-  tags {
-    env = "${var.env}"
-  }
+data "aws_route53_zone" "primary" {
+  name = "artrunde.com."
+  private_zone = false
 }
 
 # ------------------------------------------------------------------------------
@@ -119,22 +110,28 @@ resource "aws_route53_zone" "assets" {
 
 resource "aws_route53_record" "assets" {
 
-  zone_id = "${aws_route53_zone.html.zone_id}"
+  zone_id = "${data.aws_route53_zone.primary.zone_id}"
   name = "${var.record_assets}"
-  type = "MX"
-  ttl = "300"
-  records = [
-    "${aws_s3_bucket.www-public-assets.bucket_domain_name}"
-  ]
+  type = "A"
+
+  alias {
+    name = "${aws_s3_bucket.www-public-assets.website_domain}"
+    zone_id = "${aws_s3_bucket.www-public-assets.hosted_zone_id}"
+    evaluate_target_health = true
+  }
 }
 
-resource "aws_route53_record" "mail-autodiscover" {
+resource "aws_route53_record" "www" {
 
-  zone_id = "${aws_route53_zone.html.zone_id}"
-  name = "${var.record_html}"
-  type = "CNAME"
-  ttl = "300"
-  records = [
-    "${aws_s3_bucket.www-public-html.bucket_domain_name}"
-  ]
+  zone_id = "${data.aws_route53_zone.primary.zone_id}"
+  name = "${var.record_www}"
+  type = "A"
+
+  alias {
+    name = "${aws_s3_bucket.www-public-html.website_domain}"
+    zone_id = "${aws_s3_bucket.www-public-html.hosted_zone_id}"
+    evaluate_target_health = true
+  }
+
 }
+
