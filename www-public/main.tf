@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 // Public domain www. e.g. www.artrunde.com
-resource "aws_s3_bucket" "www-public-www" {
+resource "aws_s3_bucket" "www-public" {
 
   bucket        = "${var.bucket_www}"
   acl           = "${var.acl_www}"
@@ -110,10 +110,10 @@ data "aws_route53_zone" "primary" {
 
 resource "aws_route53_record" "assets" {
 
-  count = "${1 - var.create_cdn}" // Dont create alias record if CDN is used
+  count = "${1 - var.create_cdn_assets}" // Dont create alias record if CDN is used
 
   zone_id = "${data.aws_route53_zone.primary.zone_id}"
-  name = "${var.record_assets}"
+  name = "${var.alias_record_assets}"
   type = "A"
 
   alias {
@@ -126,12 +126,12 @@ resource "aws_route53_record" "assets" {
 resource "aws_route53_record" "www" {
 
   zone_id = "${data.aws_route53_zone.primary.zone_id}"
-  name = "${var.record_www}"
+  name = "${var.alias_record_www}"
   type = "A"
 
   alias {
-    name = "${aws_s3_bucket.www-public-www.website_domain}"
-    zone_id = "${aws_s3_bucket.www-public-www.hosted_zone_id}"
+    name = "${aws_s3_bucket.www-public.website_domain}"
+    zone_id = "${aws_s3_bucket.www-public.hosted_zone_id}"
     evaluate_target_health = true
   }
 
@@ -142,12 +142,12 @@ resource "aws_route53_record" "www" {
 # ------------------------------------------------------------------------------
 
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
-  comment = "Some comment"
+  comment = "Asset origin identity"
 }
 
 resource "aws_cloudfront_distribution" "assets_distribution" {
 
-  count = "${var.create_cdn}" // Create CDN if set tp true
+  count = "${var.create_cdn_assets}" // Create CDN if set to true
 
   origin {
 
@@ -165,7 +165,7 @@ resource "aws_cloudfront_distribution" "assets_distribution" {
   comment             = "Cloudfront assets distribution"
   default_root_object = "index.html"
 
-  aliases = "${var.aliases_cdn}"
+  aliases = ["${var.bucket_assets}"] // FQDN for asset bucket alias
 
   default_cache_behavior {
 
@@ -181,22 +181,22 @@ resource "aws_cloudfront_distribution" "assets_distribution" {
     }
 
     viewer_protocol_policy = "allow-all"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    min_ttl                = "${var.cdn_assets_cache_min_ttl}"
+    default_ttl            = "${var.cdn_assets_cache_default_ttl}"
+    max_ttl                = "${var.cdn_assets_cache_max_ttl}"
 
   }
 
   price_class = "PriceClass_100" // Lowest
 
   tags {
-    name  = "${var.name_cdn}"
+    name  = "${var.cdn_assets_name}"
     env   = "${var.env}"
   }
 
   viewer_certificate {
     cloudfront_default_certificate  = true
-    acm_certificate_arn             = "${var.acm_certificate_arn_cdn}"
+    acm_certificate_arn             = "${var.cdn_assets_acm_certificate_arn}"
     ssl_support_method              = "sni-only"
     minimum_protocol_version        = "TLSv1"
   }
@@ -207,3 +207,23 @@ resource "aws_cloudfront_distribution" "assets_distribution" {
     }
   }
 }
+
+# ------------------------------------------------------------------------------
+# CONFIGURE DNS FOR CDN DIST.
+# ------------------------------------------------------------------------------
+
+resource "aws_route53_record" "cdn_assets" {
+
+  count = "${var.create_cdn_assets}" // Create alias if CDN set to true
+
+  zone_id = "${data.aws_route53_zone.primary.zone_id}"
+  name = "${var.alias_record_assets}"
+  type = "A"
+
+  alias {
+    name = "${aws_cloudfront_distribution.assets_distribution.domain_name}"
+    zone_id = "${aws_cloudfront_distribution.assets_distribution.hosted_zone_id}"
+    evaluate_target_health = false
+  }
+}
+
