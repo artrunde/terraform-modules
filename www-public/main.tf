@@ -209,7 +209,7 @@ resource "aws_cloudfront_distribution" "assets_distribution" {
 }
 
 # ------------------------------------------------------------------------------
-# CONFIGURE DNS FOR CDN DIST.
+# CONFIGURE DNS FOR CDN ASSETS DIST.
 # ------------------------------------------------------------------------------
 
 resource "aws_route53_record" "cdn_assets" {
@@ -223,6 +223,98 @@ resource "aws_route53_record" "cdn_assets" {
   alias {
     name = "${aws_cloudfront_distribution.assets_distribution.domain_name}"
     zone_id = "${aws_cloudfront_distribution.assets_distribution.hosted_zone_id}"
+    evaluate_target_health = false
+  }
+}
+
+
+
+# ------------------------------------------------------------------------------
+# CONFIGURE CLOUDFRONT DISTRIBUTION FOR WWW
+# ------------------------------------------------------------------------------
+
+resource "aws_cloudfront_origin_access_identity" "www_origin_access_identity" {
+  comment = "www origin identity"
+}
+
+resource "aws_cloudfront_distribution" "www_distribution" {
+
+  count = "${var.create_cdn_www}" // Create CDN if set to true
+
+  origin {
+
+    domain_name = "${aws_s3_bucket.www-public.bucket_domain_name}"
+    origin_id   = "${aws_cloudfront_origin_access_identity.origin_access_identity.id}"
+
+    s3_origin_config {
+      origin_access_identity = "${aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path}"
+    }
+
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Cloudfront www distribution"
+  default_root_object = "index.html"
+
+  aliases = ["${var.bucket_www}"] // FQDN for www bucket alias
+
+  default_cache_behavior {
+
+    allowed_methods  = ["GET", "OPTIONS", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "${aws_cloudfront_origin_access_identity.origin_access_identity.id}"
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+    min_ttl                = "${var.cdn_www_cache_min_ttl}"
+    default_ttl            = "${var.cdn_www_cache_default_ttl}"
+    max_ttl                = "${var.cdn_www_cache_max_ttl}"
+
+  }
+
+  price_class = "PriceClass_100" // Lowest
+
+  tags {
+    name  = "${var.cdn_www_name}"
+    env   = "${var.env}"
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate  = true
+    acm_certificate_arn             = "${var.cdn_www_acm_certificate_arn}"
+    ssl_support_method              = "sni-only"
+    minimum_protocol_version        = "TLSv1"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+}
+
+# ------------------------------------------------------------------------------
+# CONFIGURE DNS FOR CDN DIST.
+# ------------------------------------------------------------------------------
+
+resource "aws_route53_record" "cdn_www" {
+
+  count = "${var.create_cdn_www}" // Create alias if CDN set to true
+
+  zone_id = "${data.aws_route53_zone.primary.zone_id}"
+  name = "${var.alias_record_www}"
+  type = "A"
+
+  alias {
+    name = "${aws_cloudfront_distribution.www_distribution.domain_name}"
+    zone_id = "${aws_cloudfront_distribution.www_distribution.hosted_zone_id}"
     evaluate_target_health = false
   }
 }
