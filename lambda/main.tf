@@ -1,22 +1,11 @@
-variable "name" {
-  description = "The name of the lambda to create, which also defines (i) the archive name (.zip), (ii) the file name, and (iii) the function name"
-}
+# ------------------------------------------------------------------------------
+# LAMBDA FUNCTIONS
+# ------------------------------------------------------------------------------
 
-variable "runtime" {
-  description = "The runtime of the lambda to create"
-  default     = "nodejs"
-}
+resource "aws_lambda_function" "lambda-file" {
 
-variable "handler" {
-  description = "The handler name of the lambda (a function defined in your lambda)"
-  default     = "handler"
-}
+  count         = "${1 - var.upload_with_s3}"
 
-variable "role" {
-  description = "IAM role attached to the Lambda Function (ARN)"
-}
-
-resource "aws_lambda_function" "lambda" {
   filename      = "${var.name}.zip"
   function_name = "${var.name}_${var.handler}"
   role          = "${var.role}"
@@ -24,6 +13,20 @@ resource "aws_lambda_function" "lambda" {
   runtime       = "${var.runtime}"
 }
 
+resource "aws_lambda_function" "lambda-s3-upload" {
+
+  count         = "${var.upload_with_s3}"
+
+  s3_bucket     = "${var.bucket_name}"
+  s3_key        = "${var.name}_${var.handler}.zip"
+
+  function_name = "${var.name}_${var.handler}"
+  role          = "${var.role}"
+  handler       = "${var.name}.${var.handler}"
+  runtime       = "${var.runtime}"
+
+}
+
 output "name" {
-  value = "${aws_lambda_function.lambda.function_name}"
+  value = "${aws_lambda_function.lambda-file.function_name}"
 }
