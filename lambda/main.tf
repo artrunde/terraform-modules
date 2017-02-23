@@ -4,6 +4,9 @@
 
 resource "aws_lambda_function" "lambda-file" {
 
+  # ------------------------------------------------------------------------------
+  # CHECK FOR S3 UPLOAD
+  # ------------------------------------------------------------------------------
   count         = "${1 - var.upload_with_s3}"
 
   filename      = "${var.name}.zip"
@@ -15,6 +18,9 @@ resource "aws_lambda_function" "lambda-file" {
 
 resource "aws_lambda_function" "lambda-s3-upload" {
 
+  # ------------------------------------------------------------------------------
+  # CHECK FOR S3 UPLOAD
+  # ------------------------------------------------------------------------------
   count         = "${var.upload_with_s3}"
 
   s3_bucket     = "${var.bucket_name}"
@@ -25,8 +31,4 @@ resource "aws_lambda_function" "lambda-s3-upload" {
   handler       = "${var.name}.${var.handler}"
   runtime       = "${var.runtime}"
 
-}
-
-output "name" {
-  value = "${aws_lambda_function.lambda-file.function_name}"
 }

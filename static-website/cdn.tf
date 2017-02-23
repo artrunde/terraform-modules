@@ -3,6 +3,9 @@
 # ------------------------------------------------------------------------------
 
 resource "aws_cloudfront_origin_access_identity" "origin_identity" {
+
+  count = "${var.create_cdn}" // Create CDN if set to true
+
   comment = "Origin identity"
 }
 
