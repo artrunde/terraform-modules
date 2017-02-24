@@ -1,13 +1,14 @@
 # ------------------------------------------------------------------------------
 # LAMBDA FUNCTIONS
 # ------------------------------------------------------------------------------
+resource "aws_lambda_function" "lambda-s3-deploy" {
 
-resource "aws_lambda_function" "lambda" {
+  s3_bucket     = "${var.bucket_name}",
+  s3_key        = "${var.name}_${var.handler}.zip"
 
-  filename      = "${path.module}/helloworld.zip"
-  function_name = "${var.name}"
+  function_name = "${var.name}_${var.handler}"
   role          = "${var.role}"
-  handler       = "index.${var.handler}"
+  handler       = "${var.name}.${var.handler}"
   runtime       = "${var.runtime}"
   memory_size   = "${var.memory_size}"
 

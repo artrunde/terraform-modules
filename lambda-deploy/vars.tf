@@ -25,6 +25,15 @@ variable "role" {
   description = "IAM role attached to the Lambda Function (ARN)"
 }
 
+variable "upload_with_s3" {
+  description = "true/false if Lambda function should use bucket for fileupload"
+  default = false
+}
+
 variable "env" {
   description = "Environment tag"
+}
+
+variable "bucket_name" {
+  description = "Name and path for Lambda S3 bucket"
 }
