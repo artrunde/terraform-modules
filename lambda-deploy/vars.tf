@@ -35,5 +35,5 @@ variable "env" {
 }
 
 variable "bucket_name" {
-  description = "Name and path for Lambda S3 bucket"
+  description = "Name and path for Lambda S3 upload bucket"
 }
