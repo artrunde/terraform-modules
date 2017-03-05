@@ -7,7 +7,7 @@ resource "aws_lambda_function" "lambda-dummy" {
   count = "${var.create_dummy}" // Create simple hello world function
 
   filename      = "${path.module}/dummy-${var.runtime}.zip"
-  function_name = "${var.name}_${var.env}"
+  function_name = "${var.name}-${var.env}"
   role          = "${var.role}"
   handler       = "index.${var.handler}"
   runtime       = "${var.runtime}"

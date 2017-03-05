@@ -12,7 +12,7 @@ variable "resource_id" {
 
 variable "method" {
   description = "The HTTP method"
-  default     = "GET"
+  default     = "ANY"
 }
 
 variable "path" {
