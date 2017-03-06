@@ -2,23 +2,6 @@
 # VARS
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "rest_api_id" {
-  description = "The ID of the associated REST API"
-}
-
-variable "resource_id" {
-  description = "The API resource ID"
-}
-
-variable "method" {
-  description = "The HTTP method"
-  default     = "ANY"
-}
-
-variable "path" {
-  description = "The API resource path"
-}
-
 variable "lambda" {
   description = "The lambda name to invoke"
 }
@@ -29,4 +12,13 @@ variable "region" {
 
 variable "account_id" {
   description = "The AWS account ID"
+}
+
+variable "authorization" {
+  description = "API Gateway endpoint authorization"
+  default = "NONE"
+}
+
+variable "api_name" {
+  description = "Name for API"
 }
