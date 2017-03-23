@@ -5,7 +5,7 @@ resource "aws_lambda_function" "lambda-deploy" {
 
   filename      = "${path.module}/lambda-deploy.zip"
 
-  function_name = "${var.name}-${var.env}"
+  function_name = "${var.name}"
   role          = "${var.role}"
   handler       = "index.${var.handler}"
   runtime       = "nodejs4.3"
