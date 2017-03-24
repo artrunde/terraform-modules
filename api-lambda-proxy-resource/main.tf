@@ -27,7 +27,7 @@ resource "aws_api_gateway_integration" "request_method_integration" {
 resource "aws_lambda_permission" "allow_api_gateway" {
 
   function_name = "${var.lambda}"
-  statement_id  = "AllowExecutionFromApiGateway"
+  statement_id  = "AllowExecutionFromApiGateway_${var.api_id}"
   action        = "lambda:InvokeFunction"
   principal     = "apigateway.amazonaws.com"
   source_arn    = "arn:aws:execute-api:${var.region}:${var.account_id}:${var.api_id}/*/*"
@@ -36,14 +36,8 @@ resource "aws_lambda_permission" "allow_api_gateway" {
 
 resource "aws_api_gateway_resource" "proxy_api_resource" {
   rest_api_id = "${var.api_id}"
-  parent_id   = "${aws_api_gateway_resource.api_resource.id}"
-  path_part   = "{proxy+}"
-}
-
-resource "aws_api_gateway_resource" "api_resource" {
-  rest_api_id = "${var.api_id}"
   parent_id   = "${var.root_resource_id}"
-  path_part   = "${var.resource_path}"
+  path_part   = "{proxy+}"
 }
 
 resource "aws_api_gateway_method_response" "200" {

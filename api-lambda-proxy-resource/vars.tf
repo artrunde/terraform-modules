@@ -25,7 +25,3 @@ variable "api_id" {
 variable "root_resource_id" {
   description = "root_resource_id"
 }
-
-variable "resource_path" {
-  description = "Resource path e.g /users"
-}
