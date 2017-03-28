@@ -1,7 +1,3 @@
-# ------------------------------------------------------------------------------
-# API METHOD
-# ------------------------------------------------------------------------------
-
 resource "aws_api_gateway_method" "proxy_request_method" {
 
   rest_api_id   = "${var.api_id}"
@@ -47,6 +43,7 @@ resource "aws_api_gateway_resource" "proxy_api_resource_proxy" {
 }
 
 resource "aws_api_gateway_method_response" "200" {
+  depends_on = ["aws_api_gateway_resource.proxy_api_resource_proxy","aws_api_gateway_resource.proxy_api_resource"]
   rest_api_id = "${var.api_id}"
   resource_id = "${aws_api_gateway_resource.proxy_api_resource.id}"
   http_method = "ANY"
@@ -54,6 +51,7 @@ resource "aws_api_gateway_method_response" "200" {
 }
 
 resource "aws_api_gateway_integration_response" "proxy_api_integration_response" {
+  depends_on = ["aws_api_gateway_integration.request_method_integration","aws_lambda_permission.allow_api_gateway"]
   rest_api_id = "${var.api_id}"
   resource_id = "${aws_api_gateway_resource.proxy_api_resource.id}"
   http_method = "ANY"
