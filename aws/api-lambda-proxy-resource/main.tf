@@ -1,7 +1,7 @@
 resource "aws_api_gateway_method" "proxy_request_method" {
 
   rest_api_id   = "${var.api_id}"
-  resource_id   = "${aws_api_gateway_resource.proxy_api_resource.id}"
+  resource_id   = "${aws_api_gateway_resource.proxy_api_resource_proxy.id}"
   http_method   = "ANY"
   authorization = "${var.authorization}"
 
@@ -10,7 +10,7 @@ resource "aws_api_gateway_method" "proxy_request_method" {
 resource "aws_api_gateway_integration" "request_method_integration" {
 
   rest_api_id = "${var.api_id}"
-  resource_id = "${aws_api_gateway_resource.proxy_api_resource.id}"
+  resource_id = "${aws_api_gateway_resource.proxy_api_resource_proxy.id}"
   http_method = "${aws_api_gateway_method.proxy_request_method.http_method}"
   type        = "AWS_PROXY"
   uri         = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${var.region}:${var.account_id}:function:${var.lambda}/invocations"
@@ -43,17 +43,23 @@ resource "aws_api_gateway_resource" "proxy_api_resource_proxy" {
 }
 
 resource "aws_api_gateway_method_response" "200" {
+
   depends_on = ["aws_api_gateway_resource.proxy_api_resource_proxy","aws_api_gateway_resource.proxy_api_resource"]
+
   rest_api_id = "${var.api_id}"
-  resource_id = "${aws_api_gateway_resource.proxy_api_resource.id}"
+  resource_id = "${aws_api_gateway_resource.proxy_api_resource_proxy.id}"
   http_method = "ANY"
   status_code = "200"
+
 }
 
 resource "aws_api_gateway_integration_response" "proxy_api_integration_response" {
+
   depends_on = ["aws_api_gateway_integration.request_method_integration","aws_lambda_permission.allow_api_gateway"]
+
   rest_api_id = "${var.api_id}"
-  resource_id = "${aws_api_gateway_resource.proxy_api_resource.id}"
+  resource_id = "${aws_api_gateway_resource.proxy_api_resource_proxy.id}"
   http_method = "ANY"
   status_code = "${aws_api_gateway_method_response.200.status_code}"
+
 }
