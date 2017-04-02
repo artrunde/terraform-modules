@@ -1,31 +1,31 @@
 # ---------------------------------------------------------------------------------------------------------------------
-# VARS
+# OPTIONAL PARAMETERS
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "lambda" {
-  description = "The lambda name to invoke"
+variable "terra_env" {
+  description = "Terraform environment. E.g dev/prd"
 }
 
-variable "region" {
-  description = "The AWS region, e.g., eu-west-1"
+variable "namespace" {
+  description = "Namespace of service"
 }
 
 variable "account_id" {
-  description = "The AWS account ID"
+  description = "AWS account number"
 }
 
-variable "authorization" {
-  description = "API Gateway endpoint authorization"
+variable "region" {
+  description = "AWS region"
 }
 
-variable "api_id" {
-  description = "AWS API Gateway ID"
+variable "stage_name" {
+  description = "Stagename to deploy"
 }
 
-variable "root_resource_id" {
-  description = "root_resource_id"
+variable "api_version" {
+  description = "E.g v1, v2..."
 }
 
-variable "resource_path" {
-  description = "Resource path for proxying"
+variable "role_lambda_arn" {
+
 }

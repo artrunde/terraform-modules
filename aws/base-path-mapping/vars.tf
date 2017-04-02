@@ -6,7 +6,15 @@ variable "domain_name" {
   description = "dns domain"
 }
 
-variable "api_version_map" {
-  description = "Map of { version = \"api_id:stage_name\" }"
+variable "stage_map" {
+  description = "List of APIs"
   type = "map"
+}
+
+variable "active_stage" {
+  description = "Name of active stage"
+}
+
+variable "version" {
+  description = "E.g v1,v2..."
 }

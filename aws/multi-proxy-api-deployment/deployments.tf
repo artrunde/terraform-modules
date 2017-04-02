@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# DALI APIs - API
+# API
 # ------------------------------------------------------------------------------
 
 resource "aws_api_gateway_rest_api" "rodin_proxy_public_api" {
@@ -10,7 +10,7 @@ resource "aws_api_gateway_rest_api" "rodin_proxy_public_api" {
 }
 
 # ------------------------------------------------------------------------------
-# DALI API - DEPLOYMENTS
+# DEPLOYMENTS
 # ------------------------------------------------------------------------------
 
 resource "aws_api_gateway_deployment" "proxy_public_api_deployment" {

@@ -4,10 +4,8 @@
 
 resource "aws_lambda_function" "lambda_dummy" {
 
-  count = "${var.api_count}"
-
   filename      = "${path.module}/dummy-nodejs4.3.zip"
-  function_name = "${var.namespace}_php_lambda_proxy_${var.terra_env}_${count.index}"
+  function_name = "${var.namespace}_${var.api_version}_${var.stage_name}_${var.terra_env}"
   role          = "${var.role_lambda_arn}"
   handler       = "index.handler"
   runtime       = "nodejs4.3"

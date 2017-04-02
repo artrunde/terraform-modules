@@ -22,3 +22,7 @@ variable "api_count" {
   description = "Number of APIs"
   type = "string"
 }
+
+variable "role_lambda_arn" {
+  description = "Lambda role arn"
+}
