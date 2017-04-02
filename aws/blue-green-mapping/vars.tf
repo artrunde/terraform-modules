@@ -11,7 +11,7 @@ variable "stage_map" {
   type = "map"
 }
 
-variable "active" {
+variable "active_stage" {
   description = "Name of active stage"
 }
 
