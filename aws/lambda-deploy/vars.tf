@@ -37,3 +37,11 @@ variable "env" {
 variable "bucket_name" {
   description = "Name and path for Lambda S3 upload bucket"
 }
+
+variable "account_id" {
+  description = "Account ID for AWS e.g 111122223333"
+}
+
+variable "s3_user" {
+  description = "Name of user to access bucket"
+}

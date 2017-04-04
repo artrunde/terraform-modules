@@ -19,6 +19,6 @@ resource "aws_lambda_permission" "allow_bucket" {
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.lambda-deploy.arn}"
   principal     = "s3.amazonaws.com"
-  source_arn    = "${aws_s3_bucket.lambda-deploy-bucket.arn}"
+  source_arn    = "${aws_s3_bucket.lambda_deploy_bucket.arn}"
 
 }
