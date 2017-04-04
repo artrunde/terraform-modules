@@ -64,10 +64,11 @@ resource "aws_s3_bucket" "s3-website-log" {
 
   count         = "${var.create_log}" // Create log bucket if set to true
   bucket        = "${var.bucket_name}-logs-${random_id.log-suffix.hex}"
-  force_destroy = false
+  force_destroy = true
   acl           = "log-delivery-write"
 
   tags {
     "env"   = "${var.env}"
   }
+  
 }
